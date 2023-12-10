@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  additional-service:
+    image: nginx:latest
+    ports:
+      - "8082:80"
+    # Add any other configurations for the new service
