@@ -1,0 +1,82 @@
+version: '3.8'
+
+services: 
+  airflow-triggerer:
+    extends: 
+      file: docker-compose.yaml
+      service: airflow-triggerer
+
+  airflow-init:
+    extends:
+      file: docker-compose.yaml
+      service: airflow-init
+    environment:
+      AIRFLOW_UID: 50000
+      _AIRFLOW_DB_MIGRATE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
+       
+     
+
+  postgres:
+    extends:
+      file: docker-compose.yaml
+      service: postgres
+    ports:
+      - "5432:5432" 
+
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: separate_db
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5433:5432"
+
+  airflow-webserver:
+    extends:
+      file: docker-compose.yaml
+      service: airflow-webserver
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+
+ 
+  airflow-scheduler:
+    extends:
+      file: docker-compose.yaml
+      service: airflow-scheduler
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+
+
+  airflow-worker:
+    extends:
+      file: docker-compose.yaml
+      service: airflow-worker
+
+  airflow-cli:
+    extends:
+      file: docker-compose.yaml
+      service: airflow-cli    
+
+
+  flower:
+    extends:
+      file: docker-compose.yaml
+      service: flower
+
+  redis:
+    extends:
+      file: docker-compose.yaml
+      service: redis
+
+volumes:
+  db-volume:
+  postgres-db-volume:
